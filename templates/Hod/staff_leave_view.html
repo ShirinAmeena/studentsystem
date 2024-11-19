@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Staff Leave</h2>
+      {% include 'includes/messages.html' %}
+    <table class="table table-striped table-hover" id="table_id">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Staff Name</th>
+                <th scope="col">leave Date</th>
+                  <th scope="col">Message</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in staff_leave %}
+            <tr>
+                <th scope="row">{{ i.id }}</th>
+                <td>{{ i.staff_id.admin.first_name }}</td>
+                <td>{{ i.data }}</td>
+                <td>{{ i.message}}</td>
+
+
+
+                <td>
+                    {% if i.status == 0 %}
+                    <a href="{% url 'staff_approve_leave' i.id %}"><button class="btn btn-success">Approve</button></a>
+                    <a href="{% url 'staff_disapprove_leave' i.id %}"><button class="btn btn-danger">Disapprove</button></a>
+                    {% elif i.status == 1 %}
+                     <button class="btn btn-success" disabled="disabled">Approve</button>
+                    {% else %}
+                    <button class="btn btn-success" disabled="disabled">Dispprove</button>
+                    {% endif %}
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

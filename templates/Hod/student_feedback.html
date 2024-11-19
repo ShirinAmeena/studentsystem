@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Student Feedback</h2>
+
+    {% include 'includes/messages.html' %}
+    <table class="table table-striped table-hover" id="table_id">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Student Name</th>
+                <th scope="col">Feedback</th>
+                <th scope="col">Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in feedback %}
+            <tr>
+                <th scope="row">{{ i.id }}</th>
+                <td>
+                    <div class="d-flex align-items-center">
+                       <img src="/{{ i.student_id.admin.profile_pic }}" alt="Profile Picture" width="50" height="50" class="rounded-circle me-2">
+                        <span>{{ i.student_id.admin.first_name }} {{ i.student_id.admin.last_name }}</span>
+                    </div>
+
+                </td>
+                <td>{{ i.feedback }}</td>
+                <td>{{ i.created_at|date:"d M Y h:i A" }}</td>
+                <td>
+                    <!-- Button to open reply modal -->
+                    <button class="btn btn-success openModalBtn" data-modal-id="myModal2-{{ i.id }}">Reply</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modals for each feedback -->
+{% for i in feedback %}
+<div id="myModal2-{{ i.id }}" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h4>Reply to {{ i.student_id.admin.first_name }}</h4>
+        <form method="post" action="{% url 'student_feedback_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="feedback_id" value="{{ i.id }}">
+            <textarea class="form-control mb-3" name="feedback_reply" placeholder="Enter your reply"></textarea>
+            <button type="submit" class="btn btn-success">Send Reply</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal CSS -->
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 60%;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+</style>
+
+<!-- Modal JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle opening modals
+        document.querySelectorAll('.openModalBtn').forEach(function (button) {
+            button.onclick = function () {
+                var modalId = button.getAttribute('data-modal-id');
+                var modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.style.display = "block";
+                }
+            };
+        });
+
+        // Handle closing modals
+        document.querySelectorAll('.close').forEach(function (closeButton) {
+            closeButton.onclick = function () {
+                var modal = closeButton.closest('.modal');
+                if (modal) {
+                    modal.style.display = "none";
+                }
+            };
+        });
+
+        // Close modal when clicking outside the modal content
+        window.onclick = function (event) {
+            document.querySelectorAll('.modal').forEach(function (modal) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+        };
+    });
+</script>
+
+{% endblock %}
